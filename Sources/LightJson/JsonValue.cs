@@ -212,10 +212,7 @@ namespace LightJson
 			}
 		}
 
-		/// <summary>
-		/// Gets this value as a String type.
-		/// </summary>
-		public string AsString
+		public float AsNumberReal
 		{
 			get
 			{
@@ -223,20 +220,46 @@ namespace LightJson
 				{
 					case JsonValueType.Boolean:
 						return (this.value == 1)
-							? "true"
-							: "false";
+							? 1
+							: 0;
 
 					case JsonValueType.Number:
-						return this.value.ToString();
+						return (float)this.value;
 
 					case JsonValueType.String:
-						return (string)this.reference;
+						float number;
+						if (float.TryParse((string)this.reference, out number))
+						{
+							return number;
+						}
+						else
+						{
+							goto default;
+						}
 
 					default:
-						return null;
+						return 0;
 				}
 			}
 		}
+
+		/// <summary>
+		/// Gets this value as a String type.
+		/// </summary>
+		public string AsString
+		{
+			get
+			{
+				return Type switch 
+				{
+					JsonValueType.Boolean => value == 1 ? "true" : "false",
+					JsonValueType.Number => value.ToString(),
+					JsonValueType.String => (string)reference,
+					_ => null,
+				};
+			}
+		}
+
 
 		/// <summary>
 		/// Gets this value as an JsonObject.
@@ -391,78 +414,44 @@ namespace LightJson
 			this.reference = reference;
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the JsonValue struct, representing a Boolean value.
-		/// </summary>
-		/// <param name="value">The value to be wrapped.</param>
-		public JsonValue(bool? value)
+		public JsonValue(bool value)
 		{
-			if (value.HasValue)
-			{
-				this.reference = null;
-
-				this.type = JsonValueType.Boolean;
-
-				this.value = value.Value ? 1 : 0;
-			}
-			else
-			{
-				this = JsonValue.Null;
-			}
+			this.reference = null;
+			this.type = JsonValueType.Boolean;
+			this.value = value ? 1 : 0;
+			return;
 		}
-
-		/// <summary>
-		/// Initializes a new instance of the JsonValue struct, representing a Number value.
-		/// </summary>
-		/// <param name="value">The value to be wrapped.</param>
-		public JsonValue(double? value)
+		public JsonValue(double value)
 		{
-			if (value.HasValue)
-			{
-				this.reference = null;
-
-				this.type = JsonValueType.Number;
-
-				this.value = value.Value;
-			}
-			else
-			{
-				this = JsonValue.Null;
-			}
+			this.reference = null;
+			this.type = JsonValueType.Number;
+			this.value = value;
+			return;
 		}
-
-		/// <summary>
-		/// Initializes a new instance of the JsonValue struct, representing a String value.
-		/// </summary>
-		/// <param name="value">The value to be wrapped.</param>
+		public JsonValue(float value)
+		{
+			this.reference = null;
+			this.type = JsonValueType.Number;
+			this.value = value;
+			return;
+		}
 		public JsonValue(string value)
 		{
 			if (value != null)
 			{
 				this.value = default(double);
-
 				this.type = JsonValueType.String;
-
 				this.reference = value;
+				return;
 			}
-			else
-			{
-				this = JsonValue.Null;
-			}
+			this = JsonValue.Null;
 		}
-
-		/// <summary>
-		/// Initializes a new instance of the JsonValue struct, representing a JsonObject.
-		/// </summary>
-		/// <param name="value">The value to be wrapped.</param>
 		public JsonValue(JsonObject value)
 		{
 			if (value != null)
 			{
 				this.value = default(double);
-
 				this.type = JsonValueType.Object;
-
 				this.reference = value;
 			}
 			else
@@ -470,80 +459,42 @@ namespace LightJson
 				this = JsonValue.Null;
 			}
 		}
-
-		/// <summary>
-		/// Initializes a new instance of the JsonValue struct, representing a Array reference value.
-		/// </summary>
-		/// <param name="value">The value to be wrapped.</param>
 		public JsonValue(JsonArray value)
 		{
 			if (value != null)
 			{
 				this.value = default(double);
-
 				this.type = JsonValueType.Array;
-
 				this.reference = value;
+				return;
 			}
-			else
-			{
-				this = JsonValue.Null;
-			}
+			this = JsonValue.Null;
 		}
 
-		/// <summary>
-		/// Converts the given nullable boolean into a JsonValue.
-		/// </summary>
-		/// <param name="value">The value to be converted.</param>
-		public static implicit operator JsonValue(bool? value)
+		public static implicit operator JsonValue(bool value)
 		{
 			return new JsonValue(value);
 		}
-
-		/// <summary>
-		/// Converts the given nullable double into a JsonValue.
-		/// </summary>
-		/// <param name="value">The value to be converted.</param>
-		public static implicit operator JsonValue(double? value)
+		public static implicit operator JsonValue(double value)
 		{
 			return new JsonValue(value);
 		}
-
-		/// <summary>
-		/// Converts the given string into a JsonValue.
-		/// </summary>
-		/// <param name="value">The value to be converted.</param>
+		public static implicit operator JsonValue(float value)
+		{
+			return new JsonValue(value);
+		}
 		public static implicit operator JsonValue(string value)
 		{
 			return new JsonValue(value);
 		}
-
-		/// <summary>
-		/// Converts the given JsonObject into a JsonValue.
-		/// </summary>
-		/// <param name="value">The value to be converted.</param>
 		public static implicit operator JsonValue(JsonObject value)
 		{
 			return new JsonValue(value);
 		}
-
-		/// <summary>
-		/// Converts the given JsonArray into a JsonValue.
-		/// </summary>
-		/// <param name="value">The value to be converted.</param>
 		public static implicit operator JsonValue(JsonArray value)
 		{
 			return new JsonValue(value);
 		}
-
-		/// <summary>
-		/// Converts the given DateTime? into a JsonValue.
-		/// </summary>
-		/// <remarks>
-		/// The DateTime value will be stored as a string using ISO 8601 format,
-		/// since JSON does not define a DateTime type.
-		/// </remarks>
-		/// <param name="value">The value to be converted.</param>
 		public static implicit operator JsonValue(DateTime? value)
 		{
 			if (value == null)
@@ -553,11 +504,6 @@ namespace LightJson
 
 			return new JsonValue(value.Value.ToString("o"));
 		}
-
-		/// <summary>
-		/// Converts the given JsonValue into an Int.
-		/// </summary>
-		/// <param name="jsonValue">The JsonValue to be converted.</param>
 		public static implicit operator int(JsonValue jsonValue)
 		{
 			if (jsonValue.IsInteger)
@@ -569,31 +515,6 @@ namespace LightJson
 				return 0;
 			}
 		}
-
-		/// <summary>
-		/// Converts the given JsonValue into a nullable Int.
-		/// </summary>
-		/// <param name="jsonValue">The JsonValue to be converted.</param>
-		/// <exception cref="System.InvalidCastException">
-		/// Throws System.InvalidCastException when the inner value type of the
-		/// JsonValue is not the desired type of the conversion.
-		/// </exception>
-		public static implicit operator int?(JsonValue jsonValue)
-		{
-			if (jsonValue.IsNull)
-			{
-				return null;
-			}
-			else
-			{
-				return (int)jsonValue;
-			}
-		}
-
-		/// <summary>
-		/// Converts the given JsonValue into a Bool.
-		/// </summary>
-		/// <param name="jsonValue">The JsonValue to be converted.</param>
 		public static implicit operator bool(JsonValue jsonValue)
 		{
 			if (jsonValue.IsBoolean)
@@ -605,31 +526,6 @@ namespace LightJson
 				return false;
 			}
 		}
-
-		/// <summary>
-		/// Converts the given JsonValue into a nullable Bool.
-		/// </summary>
-		/// <param name="jsonValue">The JsonValue to be converted.</param>
-		/// <exception cref="System.InvalidCastException">
-		/// Throws System.InvalidCastException when the inner value type of the
-		/// JsonValue is not the desired type of the conversion.
-		/// </exception>
-		public static implicit operator bool?(JsonValue jsonValue)
-		{
-			if (jsonValue.IsNull)
-			{
-				return null;
-			}
-			else
-			{
-				return (bool)jsonValue;
-			}
-		}
-
-		/// <summary>
-		/// Converts the given JsonValue into a Double.
-		/// </summary>
-		/// <param name="jsonValue">The JsonValue to be converted.</param>
 		public static implicit operator double(JsonValue jsonValue)
 		{
 			if (jsonValue.IsNumber)
@@ -641,31 +537,17 @@ namespace LightJson
 				return double.NaN;
 			}
 		}
-
-		/// <summary>
-		/// Converts the given JsonValue into a nullable Double.
-		/// </summary>
-		/// <param name="jsonValue">The JsonValue to be converted.</param>
-		/// <exception cref="System.InvalidCastException">
-		/// Throws System.InvalidCastException when the inner value type of the
-		/// JsonValue is not the desired type of the conversion.
-		/// </exception>
-		public static implicit operator double?(JsonValue jsonValue)
+		public static implicit operator float(JsonValue jsonValue)
 		{
-			if (jsonValue.IsNull)
+			if (jsonValue.IsNumber)
 			{
-				return null;
+				return (float)jsonValue.value;
 			}
 			else
 			{
-				return (double)jsonValue;
+				return float.NaN;
 			}
 		}
-
-		/// <summary>
-		/// Converts the given JsonValue into a String.
-		/// </summary>
-		/// <param name="jsonValue">The JsonValue to be converted.</param>
 		public static implicit operator string(JsonValue jsonValue)
 		{
 			if (jsonValue.IsString || jsonValue.IsNull)

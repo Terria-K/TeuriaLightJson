@@ -47,23 +47,15 @@ namespace LightJson.Serialization
 			this.Position = position;
 		}
 
-		private static string GetDefaultMessage(ErrorType type)
-		{
-			switch (type)
+		private static string GetDefaultMessage(ErrorType type) =>
+			type switch 
 			{
-				case ErrorType.IncompleteMessage:
-					return "The string ended before a value could be parsed.";
-
-				case ErrorType.InvalidOrUnexpectedCharacter:
-					return "The parser encountered an invalid or unexpected character.";
-
-				case ErrorType.DuplicateObjectKeys:
-					return "The parser encountered a JsonObject with duplicate keys.";
-
-				default:
-					return "An error occurred while parsing the JSON message.";
-			}
-		}
+				ErrorType.IncompleteMessage => "The string ended before a value could be parsed.",
+				ErrorType.InvalidOrUnexpectedCharacter => "The parser encountered an invalid or unexpected character.",
+				ErrorType.DuplicateObjectKeys => "The parser encountered a JsonObject with duplicate keys.",
+				_ => "An error occurred while parsing the JSON message.",
+			};
+		
 
 		/// <summary>
 		/// Enumerates the types of errors that can occur when parsing a JSON message.

@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.5.0</Version>
-    <Authors>Marcos López C.</Authors>
+    <TargetFramework>net7.0</TargetFramework>
+    <Version>0.5.1-Teuria</Version>
+    <Authors>Marcos López C. (Modified By Terria)</Authors>
     <Description>A minimalist JSON library designed to easily encode and decode JSON messages.</Description>
     <Copyright>Copyright © 2022 Marcos López C.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -11,10 +11,6 @@
     <RepositoryUrl>https://github.com/MarcosLopezC/LightJson.git</RepositoryUrl>
     <PackageTags>JSON</PackageTags>
     <RepositoryType>git</RepositoryType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\PROJECTS\Personal\LightJson\Sources\LightJson\LightJson.xml</DocumentationFile>
   </PropertyGroup>
 
 </Project>

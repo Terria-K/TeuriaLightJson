@@ -83,7 +83,7 @@ namespace LightJson.Serialization
 				WriteIndentation();
 			}
 
-			InnerWriter.Write(text);
+			InnerWriter.Write(text.AsSpan());
 		}
 
 		private void WriteEncodedJsonValue(JsonValue value)
@@ -112,11 +112,11 @@ namespace LightJson.Serialization
 					break;
 
 				case JsonValueType.Object:
-					Write(string.Format("JsonObject[{0}]", value.AsJsonObject.Count));
+					Write($"JsonObject[{value.AsJsonObject.Count}]");
 					break;
 
 				case JsonValueType.Array:
-					Write(string.Format("JsonArray[{0}]", value.AsJsonArray.Count));
+					Write($"JsonArray[{value.AsJsonArray.Count}]");
 					break;
 
 				default:
@@ -124,7 +124,7 @@ namespace LightJson.Serialization
 			}
 		}
 
-		private void WriteEncodedString(string text)
+		private void WriteEncodedString(ReadOnlySpan<char> text)
 		{
 			Write("\"");
 

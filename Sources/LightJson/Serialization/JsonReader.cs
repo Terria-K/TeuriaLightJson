@@ -30,38 +30,24 @@ namespace LightJson.Serialization
 
 			var next = this.scanner.Peek();
 
-			if (char.IsNumber(next))
+			if (char.IsNumber(next)) 
 			{
 				return ReadNumber();
 			}
 
-			switch (next)
+
+			return next switch 
 			{
-				case '{':
-					return ReadObject();
-
-				case '[':
-					return ReadArray();
-
-				case '"':
-					return ReadString();
-
-				case '-':
-					return ReadNumber();
-
-				case 't':
-				case 'f':
-					return ReadBoolean();
-
-				case 'n':
-					return ReadNull();
-
-				default:
-					throw new JsonParseException(
+				'{' => ReadObject(),
+				'[' => ReadArray(),
+				'"' => ReadString(),
+				'-' => ReadNumber(),
+				't' or 'f' => ReadBoolean(),
+				'n' => ReadNull(),
+				_ => throw new JsonParseException(
 						ErrorType.InvalidOrUnexpectedCharacter,
-						this.scanner.Position
-					);
-			}
+						this.scanner.Position)
+			};
 		}
 
 		private JsonValue ReadNull()
@@ -231,62 +217,30 @@ namespace LightJson.Serialization
 
 		private int ReadHexDigit()
 		{
-			switch (char.ToUpper(this.scanner.Read()))
+			var scannerRead = char.ToUpper(scanner.Read());
+			return scannerRead switch 
 			{
-				case '0':
-					return 0;
-
-				case '1':
-					return 1;
-
-				case '2':
-					return 2;
-
-				case '3':
-					return 3;
-
-				case '4':
-					return 4;
-
-				case '5':
-					return 5;
-
-				case '6':
-					return 6;
-
-				case '7':
-					return 7;
-
-				case '8':
-					return 8;
-
-				case '9':
-					return 9;
-
-				case 'A':
-					return 10;
-
-				case 'B':
-					return 11;
-
-				case 'C':
-					return 12;
-
-				case 'D':
-					return 13;
-
-				case 'E':
-					return 14;
-
-				case 'F':
-					return 15;
-
-				default:
-					throw new JsonParseException(
+				'0' => 0,
+				'1' => 1,
+				'2' => 2,
+				'3' => 3,
+				'4' => 4,
+				'5' => 5,
+				'6' => 6,
+				'7' => 7,
+				'8' => 8,
+				'9' => 9,
+				'A' => 10,
+				'B' => 11,
+				'C' => 12,
+				'D' => 13,
+				'E' => 14,
+				'F' => 15,
+				_ => throw new JsonParseException(
 						ErrorType.InvalidOrUnexpectedCharacter,
 						this.scanner.Position
-					);
-			}
+					)
+			};
 		}
 
 		private char ReadUnicodeLiteral()
@@ -461,9 +415,8 @@ namespace LightJson.Serialization
 		public static JsonValue ParseFile(string path)
 		{
 			if (path == null)
-			{
 				throw new ArgumentNullException("path");
-			}
+			
 
 			// NOTE: FileAccess.Read is needed to be able to open read-only files
 			using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
