@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace LightJson.Serialization;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]

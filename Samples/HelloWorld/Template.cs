@@ -37,6 +37,8 @@ public partial class Test
     [JName("dynamicDict")]
     [JDictionary(Dynamic = true)]
     public Dictionary<string, JsonValue> DynamicDict { get; set; }
+
+    public Template Template { get; set; }
 }
 
 // Manual Attaching
@@ -77,8 +79,9 @@ public record Template : IJsonDeserializable
 [JsonSerializable]
 public partial class Texture 
 {
-    public float X;
-    public float Y;
-    public int Width;
-    public int Height;
+    [JName("x")]
+    public float X { get; set; }
+    public float Y { get; set; }
+    public int Width { get; set; }
+    public int Height { get; set; }
 }
