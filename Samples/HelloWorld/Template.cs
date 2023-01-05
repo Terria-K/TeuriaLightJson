@@ -1,8 +1,48 @@
 using System;
+using System.Collections.Generic;
 using LightJson;
+using LightJson.Serialization;
 
-public record Template : IJsonSerializable
+namespace HelloWorld;
+
+
+
+[JsonSerializable]
+public partial class Test 
 {
+    [JName("text")]
+    public string Text { get; set; }
+    [JName("numbers")]
+    public int Number { get; set; }
+    [JName("texture")]
+    public Texture Texture { get; set; }
+
+    [JName("array")]
+    [JArray(SupportedTypes.Int)]
+    public int[] ArrayInt { get; set; }
+
+    [JName("textures")]
+    [JArray(SupportedTypes.Other)]
+    public Texture[] Textures { get; set; }
+
+
+    [JName("array2D")]
+    [JArray(SupportedTypes.Boolean2D)]
+    public bool[,] ArrayBool2D { get; set; }
+
+    [JName("dict")]
+    [JDictionary()]
+    public Dictionary<string, Texture> Dict { get; set; }
+
+    [JName("dynamicDict")]
+    [JDictionary(Dynamic = true)]
+    public Dictionary<string, JsonValue> DynamicDict { get; set; }
+}
+
+// Manual Attaching
+public record Template : IJsonDeserializable
+{
+    
     public int Number { get; set; }
     public string Text { get; set; }
     public int[] Frames { get; set; }
@@ -34,23 +74,11 @@ public record Template : IJsonSerializable
     }
 }
 
-public record Texture : IJsonSerializable
+[JsonSerializable]
+public partial class Texture 
 {
     public float X;
     public float Y;
     public int Width;
     public int Height;
-
-    public void Deserialize(JsonObject obj)
-    {
-        X = (float)obj["x"].AsNumber;
-        Y = (float)obj["y"].AsNumber;
-        Width = obj["width"];
-        Height = obj["height"];
-    }
-
-    public string Serialize()
-    {
-        throw new NotImplementedException();
-    }
 }

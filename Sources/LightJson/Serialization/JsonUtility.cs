@@ -5,6 +5,47 @@ namespace LightJson;
 
 public static class JsonUtility 
 {
+#region Convert-Deserialize
+    public static T Convert<T>(this JsonValue value) 
+    where T : IJsonDeserializable, new()
+    {
+        if (value.IsNull) 
+            return default;
+        var obj = new T();
+        obj.Deserialize(value);
+        return obj;
+    }
+#endregion
+
+#region ToDictionary
+    public static Dictionary<string, JsonValue> ToDictionary(this JsonValue value)
+    {
+        if (value.IsNull) 
+            return null;
+        var dict = new Dictionary<string, JsonValue>();
+        var jsonObject = value.AsJsonObject;
+        foreach (var jsObj in jsonObject) 
+        {
+            dict.Add(jsObj.Key, jsObj.Value);
+        }
+        return dict;
+    }
+
+    public static Dictionary<string, T> ToDictionary<T>(this JsonValue value)
+    where T : IJsonDeserializable, new()
+    {
+        if (value.IsNull) 
+            return null;
+        var dict = new Dictionary<string, T>();
+        var jsonObject = value.AsJsonObject;
+        foreach (var jsObj in jsonObject) 
+        {
+            dict.Add(jsObj.Key, JsonConvert.Deserialize<T>(jsObj.Value));
+        }
+        return dict;
+    }
+#endregion
+
 #region ConvertToArray
     public static int[] ConvertToArrayInt(this JsonValue value) 
     {
@@ -93,6 +134,24 @@ public static class JsonUtility
 #endregion
 
 #region ConvertToArray2D
+    public static T[,] ConvertToArray2D<T>(this JsonValue value) 
+    where T : IJsonDeserializable, new()
+    {
+        if (value.IsNull)
+            return null;
+        var arrayX = value.AsJsonArray;
+        var arrayY = arrayX[0].AsJsonArray;
+        var objArray2D = new T[arrayX.Count, arrayY.Count];
+        for (int i = 0; i < arrayX.Count; i++) 
+        {
+            for (int j = 0; j < arrayY.Count; j++) 
+            {
+                objArray2D[i, j] = JsonConvert.Deserialize<T>(arrayX[i].AsJsonArray[j]);
+            }
+        }
+        return objArray2D;
+    }
+
     public static int[,] ConvertToArrayInt2D(this JsonValue value) 
     {
         if (value.IsNull)
