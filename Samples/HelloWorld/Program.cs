@@ -24,11 +24,11 @@ var json = new JsonObject
 
 
 Console.WriteLine(json);
-var reader = JsonReader.Parse(json);
+var reader = JsonTextReader.Parse(json);
 var template = JsonConvert.Deserialize<Template>(reader);
 Console.WriteLine(template);
 
-var reader2 = JsonReader.Parse(new JsonObject 
+var reader2 = JsonTextReader.Parse(new JsonObject 
 {
    ["number"] = 3,
    ["text"] = "Hello" 

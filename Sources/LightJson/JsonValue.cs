@@ -654,7 +654,7 @@ namespace LightJson
 		/// <param name="text">The JSON-formatted string to be parsed.</param>
 		public static JsonValue Parse(string text)
 		{
-			return JsonReader.Parse(text);
+			return JsonTextReader.Parse(text);
 		}
 
 		/// <summary>
@@ -721,7 +721,7 @@ namespace LightJson
 		/// </param>
 		public string ToString(bool pretty)
 		{
-			return JsonWriter.Serialize(this, pretty);
+			return JsonTextWriter.Serialize(this, pretty);
 		}
 
 		private class JsonValueDebugView

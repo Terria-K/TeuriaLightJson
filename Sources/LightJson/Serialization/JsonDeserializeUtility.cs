@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace LightJson;
 
-public static class JsonUtility 
+public static class JsonDeserializeUtility 
 {
 #region Convert-Deserialize
     public static T Convert<T>(this JsonValue value) 
@@ -235,6 +235,79 @@ public static class JsonUtility
             }
         }
         return floatArray2D;
+    }
+#endregion
+
+#region List
+    public static List<int> ConvertToListInt(this JsonValue value) 
+    {
+        if (value.IsNull)
+            return null;
+        var array = value.AsJsonArray;
+        var arrayCount = array.Count;
+        var intList = new List<int>(arrayCount);
+        for (int i = 0; i < arrayCount; i++) 
+        {
+            intList.Add(array[i]);
+        }
+        return intList;
+    }
+
+    public static List<string> ConvertToListString(this JsonValue value) 
+    {
+        if (value.IsNull)
+            return null;
+        var array = value.AsJsonArray;
+        var arrayCount = array.Count;
+        var stringList = new List<string>(arrayCount);
+        for (int i = 0; i < arrayCount; i++) 
+        {
+            stringList.Add(array[i]);
+        }
+        return stringList;
+    }
+
+    public static List<bool> ConvertToBooleanList(this JsonValue value) 
+    {
+        if (value.IsNull)
+            return null;
+        var array = value.AsJsonArray;
+        var arrayCount = array.Count;
+        var booleanList = new List<bool>(arrayCount);
+        for (int i = 0; i < arrayCount; i++) 
+        {
+            booleanList.Add(array[i]);
+        }
+        return booleanList;
+    }
+
+    public static List<float> ConvertToFloatList(this JsonValue value) 
+    {
+        if (value.IsNull)
+            return null;
+        var array = value.AsJsonArray;
+        var arrayCount = array.Count;
+        var floatList = new List<float>(arrayCount);
+        for (int i = 0; i < arrayCount; i++) 
+        {
+            floatList.Add(array[i]);
+        }
+        return floatList;
+    }
+
+    public static List<T> ConvertToList<T>(this JsonValue value) 
+    where T : IJsonDeserializable, new()
+    {
+        if (value.IsNull)
+            return null;
+        var array = value.AsJsonArray;
+        var arrayCount = array.Count; 
+        var objectArray = new List<T>(arrayCount);
+        for (int i = 0; i < arrayCount; i++) 
+        {
+            objectArray.Add(JsonConvert.Deserialize<T>(array[i]));
+        }
+        return objectArray;
     }
 #endregion
 }

@@ -222,7 +222,7 @@ namespace LightJson
 		/// </param>
 		public string ToString(bool pretty)
 		{
-			return JsonWriter.Serialize(this, pretty);
+			return JsonTextWriter.Serialize(this, pretty);
 		}
 
 		private class JsonObjectDebugView

@@ -10,11 +10,11 @@ namespace LightJson.Serialization
 	/// <summary>
 	/// Represents a reader that can read JsonValues.
 	/// </summary>
-	public sealed class JsonReader
+	public sealed class JsonTextReader
 	{
 		private TextScanner scanner;
 
-		private JsonReader(TextReader reader)
+		private JsonTextReader(TextReader reader)
 		{
 			this.scanner = new TextScanner(reader);
 		}
@@ -388,7 +388,7 @@ namespace LightJson.Serialization
 				throw new ArgumentNullException("reader");
 			}
 
-			return new JsonReader(reader).Parse();
+			return new JsonTextReader(reader).Parse();
 		}
 
 		/// <summary>
@@ -404,7 +404,7 @@ namespace LightJson.Serialization
 
 			using (var reader = new StringReader(source))
 			{
-				return new JsonReader(reader).Parse();
+				return new JsonTextReader(reader).Parse();
 			}
 		}
 
@@ -422,7 +422,7 @@ namespace LightJson.Serialization
 			using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
 			using (var reader = new StreamReader(stream))
 			{
-				return new JsonReader(reader).Parse();
+				return new JsonTextReader(reader).Parse();
 			}
 		}
 	}

@@ -12,14 +12,6 @@ namespace LightJson.Generator;
 [Generator]
 public sealed class JsonDeserializerGenerator : IIncrementalGenerator
 {
-    // private const string JsonSerializableAttribute = """
-    // using System;
-    // namespace LightJson.Serialization;
-
-    // [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-    // public sealed class JsonSerializableAttribute : Attribute {}
-    // """;
-
     private static string TypeCheckFunctionCall(SupportedTypes type) 
     {
         return type switch 
@@ -30,6 +22,13 @@ public sealed class JsonDeserializerGenerator : IIncrementalGenerator
             SupportedTypes.Float => ".ConvertToArrayFloat()",
             SupportedTypes.Double => ".ConvertToArrayDouble()",
             SupportedTypes.Char => ".ConvertToArrayChar()",
+            // ListArrays
+            SupportedTypes.ListInt => ".ConvertToIntList()",
+            SupportedTypes.ListString => ".ConvertToStringList()",
+            SupportedTypes.ListBoolean => ".ConvertToBooleanList()",
+            SupportedTypes.ListFloat => ".ConvertToFloatList()",
+            SupportedTypes.ListDouble => ".ConvertToDoubleList()",
+            SupportedTypes.ListOther => ".ConvertToList()",
             //2D Arrays
             SupportedTypes.Int2D => ".ConvertToArrayInt2D()",
             SupportedTypes.String2D => ".ConvertToArrayString2D()",
@@ -102,13 +101,25 @@ public sealed class JsonDeserializerGenerator : IIncrementalGenerator
         return name;
     }
 
-    private static bool CheckIfDeserializable(IPropertySymbol symbol, INamedTypeSymbol json) 
+    private static bool CheckIfDeserializable(ISymbol symbol, INamedTypeSymbol json) 
     {
-        if (symbol.Type.Interfaces.Any(x => x.Name == "IJsonDeserializable") || 
-        symbol.Type.GetAttributes().Any(x => x.AttributeClass.Name == "JsonSerializableAttribute"))
+        if (symbol is IPropertySymbol prop) 
         {
-            return true;
+            if (prop.Type.Interfaces.Any(x => x.Name == "IJsonDeserializable") || 
+            prop.Type.GetAttributes().Any(x => x.AttributeClass.Name == "JsonSerializableAttribute"))
+            {
+                return true;
+            }
         }
+        else if (symbol is IFieldSymbol field) 
+        {
+            if (field.Type.Interfaces.Any(x => x.Name == "IJsonDeserializable") || 
+            field.Type.GetAttributes().Any(x => x.AttributeClass.Name == "JsonSerializableAttribute"))
+            {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -183,7 +194,7 @@ public sealed class JsonDeserializerGenerator : IIncrementalGenerator
 
         foreach (var symbol in GetSymbols(comp, syn)) 
         {
-            var members = symbol.GetMembers().OfType<IPropertySymbol>().ToList();
+            var members = symbol.GetMembers().OfType<ISymbol>().ToList();
 
             var sb = new ValueStringBuilder(64);
             sb.AppendLine("//Source Generated Code");
@@ -198,23 +209,30 @@ public sealed class JsonDeserializerGenerator : IIncrementalGenerator
             
             sb.AppendLine("public void Deserialize(JsonObject obj)");
             sb.AppendLine("{");
-            foreach (var prop in members) 
+            foreach (var sym in members) 
             {
-                var name = prop.Name;
+                if (sym is not IPropertySymbol && sym is not IFieldSymbol)
+                    continue;
+
+                if (sym is IFieldSymbol && !sym.HasAttributeName("JObject"))
+                    continue;
+
+                var name = sym.Name;
                 SupportedTypes arrayType = SupportedTypes.Int; 
                 var additionalFunctionCall = "";
 
-                // Get the JName Attribute
-                foreach (var attr in prop.GetAttributes()) 
+                // Get the Attribute
+                foreach (var attr in sym.GetAttributes()) 
                 {
                     if (attr.AttributeClass.Name == "JIgnoreAttribute")
                         goto Ignore;
-                    if (attr.AttributeClass.Name == "JNameAttribute")
+
+                    else if (attr.AttributeClass.Name == "JNameAttribute")
                     {
                         name = JName(name, attr);
                     } 
 
-                    if (attr.AttributeClass.Name == "JDictionaryAttribute") 
+                    else if (attr.AttributeClass.Name == "JDictionaryAttribute") 
                     {
                         if (JDictionary(attr)) 
                         {
@@ -222,34 +240,99 @@ public sealed class JsonDeserializerGenerator : IIncrementalGenerator
                         } else 
                         {
                             var result = new ValueStringBuilder();
-                            var propType = prop.Type.ToDisplayString().AsSpan();
-                            var pr = prop.Type.ToDisplayParts(SymbolDisplayFormat.FullyQualifiedFormat);
-                            int i = 0;
-                            while (pr[i].ToString() != "string") 
+                            if (sym is IFieldSymbol field) 
                             {
-                                result.Append(pr[i].ToString());
-                                i++;
+                                var fieldType = field.Type.ToDisplayString().AsSpan();
+                                var pr = field.Type.ToDisplayParts(SymbolDisplayFormat.FullyQualifiedFormat);
+                                int i = 0;
+                                while (pr[i].ToString() != "string") 
+                                {
+                                    result.Append(pr[i].ToString());
+                                    i++;
+                                }
+                                var disp = fieldType.Slice(result.Length).TrimEnd('>');
+                                
+                                additionalFunctionCall = $".ToDictionary<{new string(disp)}>()";
+                            } else if (sym is IPropertySymbol prop) 
+                            {
+                                var propType = prop.Type.ToDisplayString().AsSpan();
+                                var pr = prop.Type.ToDisplayParts(SymbolDisplayFormat.FullyQualifiedFormat);
+                                int i = 0;
+                                while (pr[i].ToString() != "string") 
+                                {
+                                    result.Append(pr[i].ToString());
+                                    i++;
+                                }
+                                var disp = propType.Slice(result.Length).TrimEnd('>');
+                                
+                                additionalFunctionCall = $".ToDictionary<{new string(disp)}>()";
                             }
-                            var disp = propType.Slice(result.Length).TrimEnd('>');
-                            
-                            additionalFunctionCall = $".ToDictionary<{new string(disp)}>()";
+
                         }
                     }
 
-                    if (attr.AttributeClass.Name == "JArrayAttribute") 
+                    else if (attr.AttributeClass.Name == "JArrayAttribute") 
                     {
                         arrayType = JArray(attr);
                         if (arrayType == SupportedTypes.Other2D) 
                         {
-                            var propType = prop.Type.ToDisplayString();
-                            var pr = propType.Substring(0, propType.Length - 3);
-                            additionalFunctionCall = $".ConvertToArray<{pr}>()";
+                            if (sym is IPropertySymbol prop) 
+                            {
+                                var propType = prop.Type.ToDisplayString();
+                                var pr = propType.Substring(0, propType.Length - 3);
+                                additionalFunctionCall = $".ConvertToArray<{pr}>()";
+                            } else if (sym is IFieldSymbol field) 
+                            {
+                                var propType = field.Type.ToDisplayString();
+                                var pr = propType.Substring(0, propType.Length - 3);
+                                additionalFunctionCall = $".ConvertToArray<{pr}>()";
+                            }
+
                         }
                         else if (arrayType == SupportedTypes.Other) 
                         {
-                            var propType = prop.Type.ToDisplayString();
-                            var pr = propType.Substring(0, propType.Length - 2);
-                            additionalFunctionCall = $".ConvertToArray<{pr}>()";
+                            if (sym is IFieldSymbol field) 
+                            {
+                                var propType = field.Type.ToDisplayString();
+                                var pr = propType.Substring(0, propType.Length - 2);
+                                additionalFunctionCall = $".ConvertToArray<{pr}>()";
+                            } else if (sym is IPropertySymbol prop) 
+                            {
+                                var propType = prop.Type.ToDisplayString();
+                                var pr = propType.Substring(0, propType.Length - 2);
+                                additionalFunctionCall = $".ConvertToArray<{pr}>()";
+                            }
+                        }
+                        else if (arrayType == SupportedTypes.ListOther) 
+                        {
+                            var result = new ValueStringBuilder();
+                            if (sym is IFieldSymbol field) 
+                            {
+                                var propType = field.Type.ToDisplayString().AsSpan();
+                                var pr = field.Type.ToDisplayParts(SymbolDisplayFormat.FullyQualifiedFormat);
+                                int i = 0;
+                                while (pr[i].ToString() != "<") 
+                                {
+                                    result.Append(pr[i].ToString());
+                                    i++;
+                                }
+                                var disp = propType.Slice(result.Length).TrimEnd('>');
+                                
+                                additionalFunctionCall = $".ConvertToList<{new string(disp)}>()";
+                            } else if (sym is IPropertySymbol prop) 
+                            {
+                                var propType = prop.Type.ToDisplayString().AsSpan();
+                                var pr = prop.Type.ToDisplayParts(SymbolDisplayFormat.FullyQualifiedFormat);
+                                int i = 0;
+                                while (pr[i].ToString() != "<") 
+                                {
+                                    result.Append(pr[i].ToString());
+                                    i++;
+                                }
+                                var disp = propType.Slice(result.Length).TrimEnd('>');
+                                
+                                additionalFunctionCall = $".ConvertToList<{new string(disp)}>()";
+                            }
                         }
                         else 
                         {
@@ -260,11 +343,19 @@ public sealed class JsonDeserializerGenerator : IIncrementalGenerator
 
                 }
                 // Check if its deserializable
-                if (CheckIfDeserializable(prop, jsonAttribute)) 
+                if (CheckIfDeserializable(sym, jsonAttribute)) 
                 {
-                    additionalFunctionCall = $".Convert<{prop.Type}>()";
+                    if (sym is IFieldSymbol field) 
+                    {
+                        additionalFunctionCall = $".Convert<{field.Type}>()";
+                    }
+                    else if (sym is IPropertySymbol prop) 
+                    {
+                        additionalFunctionCall = $".Convert<{prop.Type}>()";
+                    }
+
                 }
-                sb.AppendLine($"{prop.Name} = obj[\"{name}\"]{additionalFunctionCall};");
+                sb.AppendLine($"{sym.Name} = obj[\"{name}\"]{additionalFunctionCall};");
                 Ignore:
                 sb.Append("");
             }
@@ -296,4 +387,5 @@ public enum SupportedTypes
 {
     Int, Boolean, Float, Double, Char, String, Other,
     Int2D, Boolean2D, Float2D, Double2D, Char2D, String2D, Other2D,
+    ListInt, ListBoolean, ListFloat, ListDouble, ListString, ListOther
 }

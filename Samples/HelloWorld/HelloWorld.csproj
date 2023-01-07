@@ -16,12 +16,12 @@
   <CompilerGeneratedFilesOutputPath>$(MSBuildProjectDirectory)/Generated</CompilerGeneratedFilesOutputPath>
   <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 </PropertyGroup>
-<!-- <Target Name="ExcludeGenerated" BeforeTargets="AssignTargetPaths">
+<Target Name="ExcludeGenerated" BeforeTargets="AssignTargetPaths">
   <ItemGroup>
     <Generated Include="Generated/**/*.cs" />
     <Compile Remove="@(Generated)" />
   </ItemGroup>
   <Delete Files="@(Generated)" />
-</Target> -->
+</Target>
 
 </Project>

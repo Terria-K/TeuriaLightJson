@@ -84,4 +84,10 @@ public partial class Texture
     public float Y { get; set; }
     public int Width { get; set; }
     public int Height { get; set; }
+    [JObject]
+    public int Field;
+    public int UnserializedField;
+    [JObject]
+    [JArray(SupportedTypes.Int)]
+    public int[] FieldArray;
 }

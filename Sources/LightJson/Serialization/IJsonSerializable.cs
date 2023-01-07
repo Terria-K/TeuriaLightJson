@@ -7,5 +7,5 @@ public interface IJsonDeserializable
 
 public interface IJsonSerializable 
 {
-    string Serialize();
+    JsonObject Serialize();
 }

@@ -7,7 +7,19 @@ public class JsonConvert
     public static T DeserializeFromFile<T>(string path) 
     where T : IJsonDeserializable, new()
     {
-        var converter = JsonReader.ParseFile(path);
+        var converter = JsonTextReader.ParseFile(path);
+        return Deserialize<T>(converter.AsJsonObject);
+    }
+    public static JsonValue DeserializeFromFile(string path) 
+    {
+        var converter = JsonTextReader.ParseFile(path);
+        return converter;
+    }
+
+    public static T DeserializeFromFileBinary<T>(string path) 
+    where T : IJsonDeserializable, new()
+    {
+        var converter = JsonBinaryReader.Parse(path);
         return Deserialize<T>(converter.AsJsonObject);
     }
     public static T Deserialize<T>(JsonObject jsObj)
@@ -18,8 +30,8 @@ public class JsonConvert
         return obj;
     }
 
-    public static string Serialize(IJsonSerializable serializable) 
+    public static string Serialize(IJsonSerializable serializable, bool pretty = false) 
     {
-        return serializable.Serialize();
+        return serializable.Serialize().ToString(pretty);
     }
 }
