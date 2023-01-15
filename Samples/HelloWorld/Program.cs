@@ -35,4 +35,46 @@ var reader2 = JsonTextReader.Parse(new JsonObject
 }.ToString());
 var test = JsonConvert.Deserialize<Test>(reader2);
 Console.WriteLine(test.Text);
-Console.ReadLine();
+
+var test2 = new Test() 
+{
+    Text = "Hello World",
+    Number = 3,
+    Texture = new () {
+        X = 2,
+        Y = 4,
+        Width = 20,
+        Height = 40
+    },
+    ArrayInt = new[] { 3, 2, 4},
+    ArrayBool2D = new [,] { 
+        { true, false, true }, 
+        { true, false, true },  
+        { true, false, false }, 
+        { false, false, false }, 
+    },
+    Textures = new Texture[4] {
+        new () { X = 2, Y = 4, Width = 20, Height = 40 },
+        new () { X = 2, Y = 4, Width = 20, Height = 40 },
+        new () { X = 2, Y = 4, Width = 20, Height = 40 },
+        new () { X = 2, Y = 4, Width = 20, Height = 40 },
+    },
+    Dict = new () { 
+        { "Player", new Texture() { X = 3, Y= 2, Width = 20, Height = 40} },
+        { "Enemy", new Texture() { X = 4, Y= 10, Width = 20, Height = 40} }
+    },
+    DynamicDict = new() {
+        {"Num", 2},
+        {"Text", "Py"}
+    }
+};
+
+var obj = test2.Serialize();
+
+JsonTextWriter.Serialize(obj, "Output/Serialized.json", true);
+JsonBinaryWriter.Serialize(obj, "Output/Serialized.bin");
+var fromBinary = JsonBinaryReader.Parse("Output/Serialized.bin");
+var reader3 = JsonConvert.Deserialize<Test>(fromBinary);
+
+// Use Debugger
+Console.WriteLine(reader3);

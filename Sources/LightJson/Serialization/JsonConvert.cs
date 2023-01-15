@@ -30,6 +30,14 @@ public class JsonConvert
         return obj;
     }
 
+    public static T Deserialize<T>(JsonValue jsObj)
+    where T : IJsonDeserializable, new() 
+    {
+        var obj = new T();
+        obj.Deserialize(jsObj);
+        return obj;
+    }
+
     public static string Serialize(IJsonSerializable serializable, bool pretty = false) 
     {
         return serializable.Serialize().ToString(pretty);

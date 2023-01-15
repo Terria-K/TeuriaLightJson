@@ -81,8 +81,10 @@ public class JsonBinaryReader
             case BinaryToken.ArrayFirst:
                 return ReadArray();
             case BinaryToken.Number:
-                if (Value is string Int)
+                if (Value is int Int)
                     return Int;
+                if (Value is long Long)
+                    return Long;
                 if (Value is float Float)
                     return Float;
                 if (Value is double Double)
@@ -153,7 +155,11 @@ public class JsonBinaryReader
                     break;
                 case BinaryToken.Char:
                     Value = reader.ReadChar();
-                    Token = BinaryToken.Char;
+                    Token = BinaryToken.Number;
+                    break;
+                case BinaryToken.Long:
+                    Value = reader.ReadInt64();
+                    Token = BinaryToken.Number;
                     break;
                 case BinaryToken.Raw:
                     var len = reader.ReadInt32();

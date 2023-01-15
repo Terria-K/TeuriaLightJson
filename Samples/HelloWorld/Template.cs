@@ -8,7 +8,7 @@ namespace HelloWorld;
 
 
 [JsonSerializable]
-public partial class Test 
+public partial class Test : IJsonSerializable
 {
     [JName("text")]
     public string Text { get; set; }
@@ -38,7 +38,21 @@ public partial class Test
     [JDictionary(Dynamic = true)]
     public Dictionary<string, JsonValue> DynamicDict { get; set; }
 
-    public Template Template { get; set; }
+
+    public JsonObject Serialize()
+    {
+        return new JsonObject 
+        {
+            ["text"] = Text,
+            ["numbers"] = Number,
+            ["texture"] = Texture.Serialize(),
+            ["array"] = ArrayInt.ConvertToJsonArray(),
+            ["textures"] = Textures.ConvertToJsonArray(),
+            ["array2D"] = ArrayBool2D.ConvertToJsonArray2D(),
+            ["dict"] = Dict.ToJsonObject(),
+            ["dynamicDict"] = DynamicDict.ToJsonObject()
+        };
+    }
 }
 
 // Manual Attaching
@@ -77,7 +91,7 @@ public record Template : IJsonDeserializable
 }
 
 [JsonSerializable]
-public partial class Texture 
+public partial class Texture : IJsonSerializable
 {
     [JName("x")]
     public float X { get; set; }
@@ -90,4 +104,17 @@ public partial class Texture
     [JObject]
     [JArray(SupportedTypes.Int)]
     public int[] FieldArray;
+
+    public JsonObject Serialize()
+    {
+        return new JsonObject 
+        {
+            ["x"] = X,
+            ["Y"] = Y,
+            ["Width"] = Width,
+            ["Height"] = Height,
+            ["Field"] = Field,
+            ["FieldArray"] = FieldArray.ConvertToJsonArray()
+        };
+    }
 }

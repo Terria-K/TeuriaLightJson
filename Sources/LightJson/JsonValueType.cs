@@ -37,4 +37,13 @@ namespace LightJson
 		/// </summary>
 		Array,
 	}
+
+	public enum JsonNumberType : byte 
+	{
+		NaN,
+		Int,
+		Double,
+		Float,
+		Long,
+	}
 }

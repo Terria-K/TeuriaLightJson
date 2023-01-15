@@ -425,5 +425,12 @@ namespace LightJson.Serialization
 				return new JsonTextReader(reader).Parse();
 			}
 		}
+
+		public static JsonValue ParseFile(FileStream fs) 
+		{
+			using var reader = new StreamReader(fs);
+
+			return new JsonTextReader(reader).Parse();
+		}
 	}
 }

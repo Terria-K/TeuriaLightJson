@@ -361,6 +361,14 @@ namespace LightJson.Serialization
 		/// Generates a string representation of the given value.
 		/// </summary>
 		/// <param name="value">The value to serialize.</param>
+		public static void Serialize(JsonValue value, string path, bool pretty = false)
+		{
+			var str = Serialize(value, pretty);
+			using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
+			using var sw = new StreamWriter(fs);
+			sw.Write(str);
+		}
+
 		public static string Serialize(JsonValue value)
 		{
 			return Serialize(value, false);

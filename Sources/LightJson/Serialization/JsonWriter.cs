@@ -3,7 +3,6 @@ using static LightJson.Serialization.JsonSerializationException;
 namespace LightJson.Serialization;
 
 // Work In Progress
-#if DEBUG
 public abstract class JsonWriter__DEBUG 
 {
     public abstract void Write(JsonValue value);
@@ -34,4 +33,3 @@ public abstract class JsonWriter__DEBUG
 	// 		}
     // }
 }
-#endif

@@ -13,6 +13,7 @@ namespace LightJson
 	public struct JsonValue
 	{
 		private readonly JsonValueType type;
+		private readonly JsonNumberType numberType;
 		private readonly object reference;
 		private readonly double value;
 
@@ -24,13 +25,9 @@ namespace LightJson
 		/// <summary>
 		/// Gets the type of this JsonValue.
 		/// </summary>
-		public JsonValueType Type
-		{
-			get
-			{
-				return this.type;
-			}
-		}
+		public JsonValueType Type => type;
+		public JsonNumberType NumberType => numberType;
+		
 
 		/// <summary>
 		/// Gets a value indicating whether this JsonValue is Null.
@@ -69,6 +66,20 @@ namespace LightJson
 				var value = this.value;
 
 				return (value >= Int32.MinValue) && (value <= Int32.MaxValue) && unchecked((Int32)value) == value;
+			}
+		}
+		public bool IsLong
+		{
+			get
+			{
+				if (!this.IsNumber)
+				{
+					return false;
+				}
+
+				var value = this.value;
+
+				return (value >= Int64.MinValue) && (value <= Int64.MaxValue) && unchecked((Int64)value) == value;
 			}
 		}
 
@@ -209,6 +220,26 @@ namespace LightJson
 					default:
 						return 0;
 				}
+			}
+		}
+
+		public long AsLong 
+		{
+			get
+			{
+				var value = this.AsNumber;
+
+				// Prevent overflow if the value doesn't fit.
+				if (value >= long.MaxValue)
+				{
+					return int.MaxValue;
+				}
+				if (value <= long.MinValue)
+				{
+					return int.MinValue;
+				}
+
+				return (long)value;
 			}
 		}
 
@@ -421,10 +452,27 @@ namespace LightJson
 			this.value = value ? 1 : 0;
 			return;
 		}
+		public JsonValue(int value)
+		{
+			this.reference = null;
+			this.type = JsonValueType.Number;
+			numberType = JsonNumberType.Int;	
+			this.value = value;
+			return;
+		}
+		public JsonValue(long value)
+		{
+			this.reference = null;
+			this.type = JsonValueType.Number;
+			numberType = JsonNumberType.Long;	
+			this.value = value;
+			return;
+		}
 		public JsonValue(double value)
 		{
 			this.reference = null;
 			this.type = JsonValueType.Number;
+			numberType = JsonNumberType.Double;
 			this.value = value;
 			return;
 		}
@@ -432,6 +480,7 @@ namespace LightJson
 		{
 			this.reference = null;
 			this.type = JsonValueType.Number;
+			numberType = JsonNumberType.Float;
 			this.value = value;
 			return;
 		}
@@ -471,31 +520,15 @@ namespace LightJson
 			this = JsonValue.Null;
 		}
 
-		public static implicit operator JsonValue(bool value)
-		{
-			return new JsonValue(value);
-		}
-		public static implicit operator JsonValue(double value)
-		{
-			return new JsonValue(value);
-		}
-		public static implicit operator JsonValue(float value)
-		{
-			return new JsonValue(value);
-		}
-		public static implicit operator JsonValue(string value)
-		{
-			return new JsonValue(value);
-		}
-		public static implicit operator JsonValue(JsonObject value)
-		{
-			return new JsonValue(value);
-		}
-		public static implicit operator JsonValue(JsonArray value)
-		{
-			return new JsonValue(value);
-		}
-		public static implicit operator JsonValue(DateTime? value)
+        public static implicit operator JsonValue(bool value) => new JsonValue(value);
+        public static implicit operator JsonValue(int value) => new JsonValue(value);
+        public static implicit operator JsonValue(long value) => new JsonValue(value);
+        public static implicit operator JsonValue(double value) => new JsonValue(value);
+        public static implicit operator JsonValue(float value) => new JsonValue(value);
+        public static implicit operator JsonValue(string value) => new JsonValue(value);
+        public static implicit operator JsonValue(JsonObject value) => new JsonValue(value);
+        public static implicit operator JsonValue(JsonArray value) => new JsonValue(value);
+        public static implicit operator JsonValue(DateTime? value)
 		{
 			if (value == null)
 			{
@@ -509,6 +542,17 @@ namespace LightJson
 			if (jsonValue.IsInteger)
 			{
 				return jsonValue.AsInteger;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		public static implicit operator long(JsonValue jsonValue)
+		{
+			if (jsonValue.IsInteger)
+			{
+				return jsonValue.AsLong;
 			}
 			else
 			{

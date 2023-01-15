@@ -1,0 +1,95 @@
+{
+	"text": "Hello World",
+	"numbers": 3,
+	"texture": {
+		"x": 2,
+		"Y": 4,
+		"Width": 20,
+		"Height": 40,
+		"Field": 0,
+		"FieldArray": null
+	},
+	"array": [
+		3,
+		2,
+		4
+	],
+	"textures": [
+		{
+			"x": 2,
+			"Y": 4,
+			"Width": 20,
+			"Height": 40,
+			"Field": 0,
+			"FieldArray": null
+		},
+		{
+			"x": 2,
+			"Y": 4,
+			"Width": 20,
+			"Height": 40,
+			"Field": 0,
+			"FieldArray": null
+		},
+		{
+			"x": 2,
+			"Y": 4,
+			"Width": 20,
+			"Height": 40,
+			"Field": 0,
+			"FieldArray": null
+		},
+		{
+			"x": 2,
+			"Y": 4,
+			"Width": 20,
+			"Height": 40,
+			"Field": 0,
+			"FieldArray": null
+		}
+	],
+	"array2D": [
+		[
+			true,
+			false,
+			true
+		],
+		[
+			true,
+			false,
+			true
+		],
+		[
+			true,
+			false,
+			false
+		],
+		[
+			false,
+			false,
+			false
+		]
+	],
+	"dict": {
+		"Player": {
+			"x": 3,
+			"Y": 2,
+			"Width": 20,
+			"Height": 40,
+			"Field": 0,
+			"FieldArray": null
+		},
+		"Enemy": {
+			"x": 4,
+			"Y": 10,
+			"Width": 20,
+			"Height": 40,
+			"Field": 0,
+			"FieldArray": null
+		}
+	},
+	"dynamicDict": {
+		"Num": 2,
+		"Text": "Py"
+	}
+}

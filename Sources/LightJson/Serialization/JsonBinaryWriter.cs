@@ -29,7 +29,21 @@ public class JsonBinaryWriter : JsonWriter__DEBUG
                 WriteValue(value.AsBoolean);
                 break;
             case JsonValueType.Number:
-                WriteValue(value.AsNumberReal);
+                switch (value.NumberType) 
+                {
+                    case JsonNumberType.Int:
+                        WriteValue(value.AsInteger);
+                        break;
+                    case JsonNumberType.Double:
+                        WriteValue(value.AsNumber);
+                        break;
+                    case JsonNumberType.Float:
+                        WriteValue(value.AsNumberReal);
+                        break;
+                    case JsonNumberType.Long:  
+                        WriteValue(value.AsLong);
+                        break;
+                }
                 break;
             case JsonValueType.String:
                 WriteValue(value.AsString);
@@ -142,6 +156,12 @@ public class JsonBinaryWriter : JsonWriter__DEBUG
         InnerWriter.Write(value);
     }
 
+    public void WriteValue(long value) 
+    {
+        InnerWriter.Write((byte)BinaryToken.Long);
+        InnerWriter.Write(value);
+    }
+
     public void WriteValue(float value) 
     {
         InnerWriter.Write((byte)BinaryToken.Float);
@@ -194,6 +214,7 @@ public enum BinaryToken : byte
     Float,
     Double,
     Char,
+    Long,
 
     Raw = 32
 }

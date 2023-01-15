@@ -15,6 +15,5 @@ Textures = obj["textures"].ConvertToArray<HelloWorld.Texture>();
 ArrayBool2D = obj["array2D"].ConvertToArrayBoolean2D();
 Dict = obj["dict"].ToDictionary<HelloWorld.Texture>();
 DynamicDict = obj["dynamicDict"].ToDictionary();
-Template = obj["Template"].Convert<HelloWorld.Template>();
 }
 }
