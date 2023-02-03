@@ -25,6 +25,21 @@ public class JsonBinaryReader
         return jsonBinaryReader.ReadObject();
     }
 
+    public static JsonValue Parse(Stream stream) 
+    {
+        using var binaryReader = new BinaryReader(stream, Encoding.UTF8);
+        var jsonBinaryReader = new JsonBinaryReader(binaryReader);
+        return jsonBinaryReader.ReadObject();
+    }
+
+    public static JsonValue Parse(byte[] bytes) 
+    {
+        using var memoryStream = new MemoryStream(bytes);
+        using var binaryReader = new BinaryReader(memoryStream);
+        var jsonBinaryReader = new JsonBinaryReader(binaryReader);
+        return jsonBinaryReader.ReadObject();
+    }
+
     public JsonValue ReadObject() 
     {
         var result = new JsonObject();

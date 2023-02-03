@@ -1,3 +1,4 @@
+using System.IO;
 using LightJson.Serialization;
 
 namespace LightJson;
@@ -9,6 +10,19 @@ public class JsonConvert
     {
         var converter = JsonTextReader.ParseFile(path);
         return Deserialize<T>(converter.AsJsonObject);
+    }
+
+    public static T DeserializeFromStream<T>(Stream stream) 
+    where T : IJsonDeserializable, new()
+    {
+        var converter = JsonTextReader.ParseFile(stream);
+        return Deserialize<T>(converter.AsJsonObject);
+    }
+
+    public static JsonValue DeserializeFromStream(Stream stream) 
+    {
+        var converter = JsonTextReader.ParseFile(stream);
+        return converter;
     }
     public static JsonValue DeserializeFromFile(string path) 
     {

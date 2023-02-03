@@ -193,6 +193,16 @@ public class JsonBinaryWriter : JsonWriter__DEBUG
 
         jsonWriter.Write(value);
     }
+
+    public static byte[] Serialize(JsonValue value) 
+    {
+        using var memoryStream = new MemoryStream();
+        using var binaryWriter = new BinaryWriter(memoryStream, Encoding.UTF8);
+        var jsonWriter = new JsonBinaryWriter(binaryWriter);
+
+        jsonWriter.Write(value);
+        return memoryStream.GetBuffer();
+    }
 }
 
 

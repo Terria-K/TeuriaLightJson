@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <Version>0.5.1-Teuria</Version>
     <Authors>Marcos López C. (Modified By Terria)</Authors>
     <Description>A minimalist JSON library designed to easily encode and decode JSON messages.</Description>
@@ -11,6 +11,7 @@
     <RepositoryUrl>https://github.com/MarcosLopezC/LightJson.git</RepositoryUrl>
     <PackageTags>JSON</PackageTags>
     <RepositoryType>git</RepositoryType>
+    <LangVersion>11</LangVersion>
   </PropertyGroup>
 
 </Project>
