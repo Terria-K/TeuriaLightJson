@@ -1,0 +1,21 @@
+{
+    // Some comment to make your day
+    # Some pythonic comment to ruin your day
+    "random": {
+        # true, false, maybe?
+        "one": maybe,
+        "two": maybe,
+        "three": maybe,
+        "four": maybe,
+        "five": maybe,
+    },
+    # Equal declaration
+    "declareInt" = 4,
+    # SemiColon
+    "semiColon": true;
+    "itsLikeProgramming": 4;
+
+    # Range numbers
+    "randRange": (1-10),
+    "moreRange": (11-50),# Trailing commas
+}

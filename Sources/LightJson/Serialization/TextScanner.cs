@@ -63,6 +63,34 @@ namespace LightJson.Serialization
 			return (char)next;
 		}
 
+		public bool Step(out char next) 
+		{
+			int read = reader.Read();
+			next = (char)read;
+			switch (next)
+			{
+				case '\r':
+					// Normalize '\r\n' line encoding to '\n'.
+					if (reader.Peek() == '\n')
+					{
+						reader.Read();
+					}
+					goto case '\n';
+
+				case '\n':
+					this.position.line += 1;
+					this.position.column = 0;
+					next = '\n';
+					break;
+
+				default:
+					this.position.column += 1;
+					next = (char)read;
+					break;
+			}
+			return read >= 0;
+		}
+
 		/// <summary>
 		/// Reads the next character in the stream, advancing the text position.
 		/// </summary>
@@ -153,6 +181,15 @@ namespace LightJson.Serialization
 					this.position
 				);
 			}
+		}
+
+		public bool TryAssert(char next) 
+		{
+			if (Peek() == next)
+			{
+				return true;
+			}
+			return false;
 		}
 	}
 }

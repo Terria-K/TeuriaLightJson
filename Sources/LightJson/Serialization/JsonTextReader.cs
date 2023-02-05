@@ -12,6 +12,7 @@ namespace LightJson.Serialization
 	/// </summary>
 	public sealed class JsonTextReader
 	{
+		private static Random random = new Random();
 		private TextScanner scanner;
 
 		private JsonTextReader(TextReader reader)
@@ -38,16 +39,27 @@ namespace LightJson.Serialization
 
 			return next switch 
 			{
+				'(' => ReadRange(),
 				'{' => ReadObject(),
 				'[' => ReadArray(),
 				'"' => ReadString(),
 				'-' => ReadNumber(),
-				't' or 'f' => ReadBoolean(),
+				't' or 'f' or 'm' => ReadBoolean(),
 				'n' => ReadNull(),
 				_ => throw new JsonParseException(
 						ErrorType.InvalidOrUnexpectedCharacter,
 						this.scanner.Position)
 			};
+		}
+		
+		private JsonValue ReadRange() 
+		{
+			scanner.Assert("(");
+			var num = ReadNumber();
+			scanner.Assert("-");
+			var num2 = ReadNumber();
+			scanner.Assert(")");
+			return random.Next(num, num2);
 		}
 
 		private JsonValue ReadNull()
@@ -67,6 +79,10 @@ namespace LightJson.Serialization
 				case 'f':
 					this.scanner.Assert("false");
 					return false;
+				
+				case 'm':
+					this.scanner.Assert("maybe");
+					return Convert.ToBoolean(random.Next(0, 2));
 
 				default:
 					throw new JsonParseException(
@@ -276,6 +292,20 @@ namespace LightJson.Serialization
 				{
 					this.scanner.SkipWhitespace();
 
+					var comPeek = scanner.Peek();
+					if (comPeek == '/' || comPeek == '#') 
+					{
+						while (scanner.Step(out char ext) && ext != '\n' && ext != '\r')
+							continue;
+						continue;
+					}
+
+					if (!scanner.TryAssert('"')) {
+						scanner.Read();
+						break;
+					}
+
+					
 					var key = ReadJsonKey();
 
 					if (jsonObject.ContainsKey(key))
@@ -288,7 +318,11 @@ namespace LightJson.Serialization
 
 					this.scanner.SkipWhitespace();
 
-					this.scanner.Assert(':');
+					if (scanner.TryAssert(':')) {
+						scanner.Assert(':');
+					} else if (scanner.TryAssert('=')) {
+						scanner.Assert('=');
+					}
 
 					this.scanner.SkipWhitespace();
 
@@ -304,7 +338,7 @@ namespace LightJson.Serialization
 					{
 						break;
 					}
-					else if (next == ',')
+					else if (next == ',' || next == ';')
 					{
 						continue;
 					}

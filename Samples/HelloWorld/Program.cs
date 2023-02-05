@@ -78,3 +78,7 @@ var reader3 = JsonConvert.Deserialize<Test>(fromBinary);
 
 // Use Debugger
 Console.WriteLine(reader3);
+
+
+JsonObject fromText = JsonTextReader.ParseFile("test.json");
+Console.WriteLine(fromText);
