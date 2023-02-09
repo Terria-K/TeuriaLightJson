@@ -94,6 +94,20 @@ namespace LightJson
 			}
 		}
 
+		public bool IsChar 
+		{
+			get
+			{
+				if (!this.IsNumber)
+				{
+					return false;
+				}
+
+				return numberType == JsonNumberType.Char;
+
+			}
+		}
+
 		/// <summary>
 		/// Gets a value indicating whether this JsonValue is a String.
 		/// </summary>
@@ -240,6 +254,32 @@ namespace LightJson
 				}
 
 				return (long)value;
+			}
+		}
+
+		public char AsChar 
+		{
+			get
+			{
+				switch (this.Type)
+				{
+					case JsonValueType.Number:
+						return (char)this.value;
+
+					case JsonValueType.String:
+						char number;
+						if (char.TryParse((string)this.reference, out number))
+						{
+							return number;
+						}
+						else
+						{
+							goto default;
+						}
+
+					default:
+						return (char)0;
+				}
 			}
 		}
 
@@ -495,6 +535,15 @@ namespace LightJson
 			}
 			this = JsonValue.Null;
 		}
+		public JsonValue(char value)
+		{
+			this.value = value;
+			this.type = JsonValueType.Number;
+			numberType = JsonNumberType.Char;
+			this.reference = null;
+			return;
+		}
+
 		public JsonValue(JsonObject value)
 		{
 			if (value != null)
@@ -525,6 +574,7 @@ namespace LightJson
         public static implicit operator JsonValue(long value) => new JsonValue(value);
         public static implicit operator JsonValue(double value) => new JsonValue(value);
         public static implicit operator JsonValue(float value) => new JsonValue(value);
+        public static implicit operator JsonValue(char value) => new JsonValue(value);
         public static implicit operator JsonValue(string value) => new JsonValue(value);
         public static implicit operator JsonValue(JsonObject value) => new JsonValue(value);
         public static implicit operator JsonValue(JsonArray value) => new JsonValue(value);
@@ -592,6 +642,18 @@ namespace LightJson
 				return float.NaN;
 			}
 		}
+		public static implicit operator char(JsonValue jsonValue)
+		{
+			if (jsonValue.IsNumber)
+			{
+				return (char)jsonValue.value;
+			}
+			else
+			{
+				return (char)0;
+			}
+		}
+		
 		public static implicit operator string(JsonValue jsonValue)
 		{
 			if (jsonValue.IsString || jsonValue.IsNull)

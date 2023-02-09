@@ -1,11 +1,9 @@
-using static LightJson.Serialization.JsonSerializationException;
-
 namespace LightJson.Serialization;
 
 // Work In Progress
-public abstract class JsonWriter__DEBUG 
+public abstract class JsonWriter 
 {
-    public abstract void Write(JsonValue value);
+    public abstract void WriteEntry(JsonValue value);
     public abstract void Render(JsonArray value);
     public abstract void Render(JsonObject value);
 

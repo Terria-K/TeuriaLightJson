@@ -7,7 +7,7 @@ using static LightJson.Serialization.JsonSerializationException;
 namespace LightJson.Serialization;
 
 
-public class JsonBinaryWriter : JsonWriter__DEBUG
+public class JsonBinaryWriter : JsonWriter
 {
     private Stack<long> positionStack = new Stack<long>();
 
@@ -18,7 +18,7 @@ public class JsonBinaryWriter : JsonWriter__DEBUG
         InnerWriter = writer;
     }
 
-    public override void Write(JsonValue value)
+    public override void WriteEntry(JsonValue value)
     {
         switch (value.Type) 
         {
@@ -69,7 +69,7 @@ public class JsonBinaryWriter : JsonWriter__DEBUG
         var next = enumerator.MoveNext();
         while (next) 
         {
-            Write(enumerator.Current);
+            WriteEntry(enumerator.Current);
             next = enumerator.MoveNext();
         }
         WriteArrayLast();
@@ -83,7 +83,7 @@ public class JsonBinaryWriter : JsonWriter__DEBUG
         while (next) 
         {
             WriteKey(enumerator.Current.Key);
-            Write(enumerator.Current.Value);
+            WriteEntry(enumerator.Current.Value);
             next = enumerator.MoveNext();
         }
         WriteObjectLast();
@@ -191,7 +191,7 @@ public class JsonBinaryWriter : JsonWriter__DEBUG
         using var binaryWriter = new BinaryWriter(File.Create(path), Encoding.UTF8);
         var jsonWriter = new JsonBinaryWriter(binaryWriter);
 
-        jsonWriter.Write(value);
+        jsonWriter.WriteEntry(value);
     }
 
     public static byte[] Serialize(JsonValue value) 
@@ -200,7 +200,7 @@ public class JsonBinaryWriter : JsonWriter__DEBUG
         using var binaryWriter = new BinaryWriter(memoryStream, Encoding.UTF8);
         var jsonWriter = new JsonBinaryWriter(binaryWriter);
 
-        jsonWriter.Write(value);
+        jsonWriter.WriteEntry(value);
         return memoryStream.GetBuffer();
     }
 }
