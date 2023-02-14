@@ -535,14 +535,14 @@ namespace LightJson
 			}
 			this = JsonValue.Null;
 		}
-		public JsonValue(char value)
-		{
-			this.value = value;
-			this.type = JsonValueType.Number;
-			numberType = JsonNumberType.Char;
-			this.reference = null;
-			return;
-		}
+		// public JsonValue(char value)
+		// {
+		// 	this.value = value;
+		// 	this.type = JsonValueType.Number;
+		// 	numberType = JsonNumberType.Char;
+		// 	this.reference = null;
+		// 	return;
+		// }
 
 		public JsonValue(JsonObject value)
 		{
@@ -574,7 +574,7 @@ namespace LightJson
         public static implicit operator JsonValue(long value) => new JsonValue(value);
         public static implicit operator JsonValue(double value) => new JsonValue(value);
         public static implicit operator JsonValue(float value) => new JsonValue(value);
-        public static implicit operator JsonValue(char value) => new JsonValue(value);
+        // public static implicit operator JsonValue(char value) => new JsonValue(value);
         public static implicit operator JsonValue(string value) => new JsonValue(value);
         public static implicit operator JsonValue(JsonObject value) => new JsonValue(value);
         public static implicit operator JsonValue(JsonArray value) => new JsonValue(value);
@@ -598,16 +598,19 @@ namespace LightJson
 				return 0;
 			}
 		}
+		//FIXME: Check for long to not be able to deserialized properly and always returned 0
 		public static implicit operator long(JsonValue jsonValue)
 		{
-			if (jsonValue.IsInteger)
-			{
-				return jsonValue.AsLong;
-			}
-			else
-			{
-				return 0;
-			}
+			// if (jsonValue.IsInteger)
+			// {
+
+			return jsonValue.AsLong;
+			// }
+			// else
+			// {
+
+			// 	return 0;
+			// }
 		}
 		public static implicit operator bool(JsonValue jsonValue)
 		{
@@ -642,17 +645,17 @@ namespace LightJson
 				return float.NaN;
 			}
 		}
-		public static implicit operator char(JsonValue jsonValue)
-		{
-			if (jsonValue.IsNumber)
-			{
-				return (char)jsonValue.value;
-			}
-			else
-			{
-				return (char)0;
-			}
-		}
+		// public static implicit operator char(JsonValue jsonValue)
+		// {
+		// 	if (jsonValue.IsNumber)
+		// 	{
+		// 		return (char)jsonValue.value;
+		// 	}
+		// 	else
+		// 	{
+		// 		return (char)0;
+		// 	}
+		// }
 		
 		public static implicit operator string(JsonValue jsonValue)
 		{
