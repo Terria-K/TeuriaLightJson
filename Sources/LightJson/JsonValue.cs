@@ -833,6 +833,15 @@ namespace LightJson
 			return JsonTextWriter.Serialize(this, pretty);
 		}
 
+		public bool Contains(string value) 
+		{
+			if (IsJsonObject) 
+			{
+				return ((JsonObject)reference).ContainsKey(value);
+			}	
+			return false;
+		}
+
 		private class JsonValueDebugView
 		{
 			private JsonValue jsonValue;
